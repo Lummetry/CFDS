@@ -24,6 +24,7 @@ Copyright 2019 Lummetry.AI (Knowledge Investment Group SRL). All Rights Reserved
 import numpy as np
 import scipy.sparse as sparse
 import pandas as pd
+import time
 
 if __name__ == '__main__':
   TEST_SIZE = 0.2
@@ -35,10 +36,8 @@ if __name__ == '__main__':
   # X[:,0] =  (X[:,0] -  X[:,0].mean()) / X[:,0].std()
   X[:,0] =  (X[:,0] -  X[:,0].min()) / (X[:,0].max() - X[:,0].min())
 
-  X = X[:,:100]
-  
-  
-  
+  # X = X[:,:100]
+
   train_sample = np.random.choice(
     [0,1], 
     replace=True, 
@@ -49,14 +48,18 @@ if __name__ == '__main__':
   X_train = X[train_sample]
   y_train = y[train_sample]
   X_test = X[~train_sample]
-  y_test =y[~train_sample]
+  y_test = y[~train_sample]
   
+  start = time()
   theta = np.linalg.inv(X_train.T.dot(X_train) + LAMBDA * np.eye(X_train.shape[1])).dot(X_train.T).dot(y_train)
+  stop = time()
+  print('Results for X shape: {}'.format(X.shape))
+  print(' Total time: {}'.format(stop - start))
   
   y_pred = X_test.dot(theta).round(0)
   
   MAE = np.abs(y_pred - y_test).mean()
-  print(MAE)
+  print(' MAE: {}'.format(MAE))
   
   df_res = pd.DataFrame({'pred':y_pred, 'gold':y_test})
   print(df_res.head(10))
